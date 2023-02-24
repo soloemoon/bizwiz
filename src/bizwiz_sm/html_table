@@ -97,3 +97,8 @@ class html_table:
                 .hide(axis='index')
             )
         return tbl
+        
+     def column_bar(self, column_colors):
+        for k, v in column_colors.items():
+            t = tbl.bar(subset=[k], color=v)
+        return t
