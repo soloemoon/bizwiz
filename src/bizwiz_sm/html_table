@@ -1,0 +1,99 @@
+class html_table:
+    styles = [
+        dict(selector="tr:hover",
+                    props=[("background", "#f4f4f4")]),
+
+        dict(selector="th", props=[("color", "#fff"),
+                                ("border", "1px solid #eee"),
+                                ("padding", "12px 35px"),
+                                ("border-collapse", "collapse"),
+                                ("background", "#00cccc"),
+                                ("text-transform", "uppercase"),
+                                ("font-size", "18px")
+                                ]),
+
+        dict(selector="td", props=[("color", "#999"),
+                                ("border", "1px solid #eee"),
+                                ("padding", "12px 35px"),
+                                ("border-collapse", "collapse"),
+                                ("font-size", "15px")
+                                ]),
+        dict(selector="table", props=[
+                                        ("font-family" , 'Arial'),
+                                        ("margin" , "25px auto"),
+                                        ("border-collapse" , "collapse"),
+                                        ("border" , "1px solid #eee"),
+                                        ("border-bottom" , "2px solid #00cccc"),                                    
+                                        ]),
+        dict(selector="caption", props=[("caption-side", "bottom")])
+    ]
+    
+    def __init__(self, df):
+        self.df = df
+    
+    def table_format(self, font='Arial', margin='25px auto', border_width ='1px', border_type='solid', border_color='black', border_collapse = 'collapse'):
+        """
+            Instantiate a multiplication operation.
+            Numbers will be multiplied by the given multiplier.
+            
+            :param multiplier: The multiplier.
+            :type multiplier: int
+        """
+        border_opt = border_width + ' ' + border_type + ' ' + border_color
+        
+        tbl_opt = [('font-family', font),
+                   ('border', border_opt),
+                   ('margin', margin),
+                   ('border-collapse', border_collapse)]
+        
+        tbl_style = dict(selector = 'table', props = tbl_opt)
+        return tbl_style
+    
+    def header_format(self, font_size='11px', text_align='center', color='#fff', background='#0912bd', font_style='normal', border_width ='1px', border_type='solid', border_color='black'):
+        border_opt = border_width + ' ' + border_type + ' ' + border_color
+       # Data Cell Element
+        th_opt = [('font-size', font_size),
+                 ('font-weight', font_style),
+                 ('text-align', text_align),
+                 ('color', color),
+                 ('background-color', background),
+                 ('border', border_opt)]
+        th_style = dict(selector = 'th', props = th_opt)
+        return th_style
+
+    def cell_format(self, font_size='11px', text_align='center', color='black',  font_style='normal', border_width ='1px', border_type='solid', border_color='black'):
+        border_opt = border_width + ' ' + border_type + ' ' + border_color
+        td_opt = [('font-size', font_size),
+                 ('font-weight', font_style),
+                 ('text-align', text_align),
+                 ('color', color),
+                 #('background-color', background_color),
+                 ('border', border_opt)]
+        td_style = dict(selector='td', props = td_opt)
+        return td_style
+    
+    def caption_format(self, caption_location='bottom'):
+        cap = dict(selector="caption", props=[("caption-side", caption_location)])
+        return cap
+    
+    def generate_table(self, header_format=None, cell_format=None, table_format = None, caption_format=None, column_format=None, table_properties={'border': '1.3px solid black','color': 'black'}, decimals=2, show_index = False):
+        styles = filter(None, [header_format, cell_format, table_format, caption_format])
+        
+
+        if show_index == True:
+            tbl = (self.df.style
+                .set_table_styles(styles)
+                #.set_caption(caption)
+                .format(column_format)
+                .set_properties(**table_properties)
+                .set_precision(decimals)
+            )
+        elif show_index == False:
+            tbl = (self.df.style
+                .set_table_styles(styles)
+                #.set_caption(caption)
+                .format(column_format, precision=decimals)
+                .set_properties(**table_properties)
+                .hide(axis='index')
+            )
+        return tbl
