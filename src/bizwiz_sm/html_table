@@ -102,3 +102,49 @@ class html_table:
         for k, v in column_colors.items():
             t = tbl.bar(subset=[k], color=v)
         return t
+     
+     def highlight_min(self, columns=None, color='red', axis=1):
+        if column is None:
+            t = self.table_output.highlight_min(subset=self.numeric_cols, color=color, axis=axis)
+        else:
+            t = self.table_output.highlight_min(subset=columns, color=color, axis=axis)
+        return t
+    
+    def highlight_max(self, columns=None, color='lightgreen', axis=1):
+        if column is None:
+            t = self.table_output.highlight_max(subset=self.numeric_cols, color=color, axis=axis)
+        else:
+            t = self.table_output.highlight_max(subset=columns, color=color, axis=axis)
+        return t
+    
+    def heatmap(self, columns = None, type = 'background', palette = 'default', color='green'):
+            # type can be background or text
+        cm_opt = {
+            'default': sns.light_palette(color, as_cmap=True),
+            'light': sns.light_palette(color, as_cmap=True),
+            'dark': sns.dark_palette(color, as_cmap=True),
+            'coolwarm': sns.color_palette('coolwarm', as_cmap=True),
+            'spectral': sns.color_palette('Spectral', as_cmap=True),
+            'coolwarm_muted': sns.color_palette(220, 20, as_cmap=True),
+            'vlag': sns.color_palette('vlag', as_cmap=True),
+            'rocket': sns.color_palette('rocket', as_cmap=True),
+            'mako': sns.color_palette('mako', as_cmap=True),
+            'flare': sns.color_palette('flare', as_cmap=True),
+            'crest': sns.color_palette('crest', as_cmap=True)
+        }
+
+        cm = cm_opt[palette]
+
+        if columns is None:
+            if type == 'background':
+                t = self.table_output.background_gradient(subset=self.numeric_cols, cmap=cm)
+
+            elif type == 'text':
+                t = self.table_output.text_gradient(subset=self.numeric_cols, cmap=cm)
+        else:
+            if type == 'background':
+                t = self.table_output.background_gradient(subset=columns, cmap=cm)
+
+            elif type == 'text':
+                t = self.table_output.text_gradient(subset=columns, cmap=cm)
+        return t
