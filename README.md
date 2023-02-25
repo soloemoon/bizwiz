@@ -36,28 +36,60 @@ c.column_bar(col_colors, align='left')
 # Flat Files
 This module is primarily built on top of polars and xlWings ensuring speed, even when working with the largest of files. 
 
-Core Features:
-* Read multiple excel or csv files into multiple dataframes or a single dataframe
+Highlight Features:
+* Read multiple excel or csv files into multiple dataframes or a single dataframe.
 * Export multiple excel sheets to a workbook
 * Ingest and automatically clean a .sql file
 * Create multiple parquet files from several flat files
 * Append multiple flat files into a single parquet file
 * Write SQL to query a parquet file
 
+Start by importing the flat_file module.
 ```
 from bizwiz import flat_file
+```
 
+## Working with multiple flat files
+Read multiple excel or csv files into multiple dataframes or a single dataframe. Output dataframe(s) to multiple parquet files, append to an existing parquet file, or create a single new parquet file.
+```
 # Initialize module with a list of file paths that you'll be working with
 ff = flat_file(file_path_list)
 
 # Read in two excel files based on the file path list
-xl1, xl2 = ff.read_multi_excel(concat=True)
+xl1, xl2 = ff.read_multi_excel(concat=False)
 
 # Create multiple parquet files from the ingested excel
 ff.create_multi_parquet(output_directory, [xl1, xl2])
+```
 
+## Export multiple excel sheets to a single workbook
+Quickly export multiple dataframes to multiple excel sheets in a single workbook. Only one line of code is needed.
+```
+# Define Parameters
+workbook_path = 'file path here'
+sheet_list = ['Sheet 1', 'Sheet 2']
+df_names = [xl1, xl2]
+
+ff = flat_file()
+ff.export_excel_shts(workbook_path, sheet_list, df_names
+```
+
+## Reading a .SQL File
+Reading in a cleaned .sql file for execution in a single line of code. This is safer and more efficient than maintaing sql queries in code. 
+```
+ff = flat_file()
 # read in a .sql file and execute it
 sql_file = ff.read_sql_file(file_path)
 conn = pyodbc.connect()
 df = pd.read_sql_query(sql_file, conn)
+```
+
+## Query an existing parquet file
+No need to define the table name in the query. Just pass the file path and bizwiz takes care of the rest.
+```
+sql = 'select * from where year > 2005'
+parquet_path = 'file path here'
+
+ff = flat_file()
+results = ff.query_parquet(sql, parquet_path)
 ```
