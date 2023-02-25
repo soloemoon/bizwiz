@@ -32,3 +32,32 @@ col_colors = {'sepal_width':'blue', 'sepal_length':'lightgreen'}
 c.column_bar(col_colors, align='left')
  ```
  <img width="729" alt="Screen Shot 2023-02-25 at 1 01 56 AM" src="https://user-images.githubusercontent.com/57546826/221343808-10a429d8-39cc-4028-8e28-6b1449a0ff6d.png">
+
+# Flat Files
+This module is primarily built on top of polars and xlWings ensuring speed, even when working with the largest of files. 
+
+Core Features:
+* Read multiple excel or csv files into multiple dataframes or a single dataframe
+* Export multiple excel sheets to a workbook
+* Ingest and automatically clean a .sql file
+* Create multiple parquet files from several flat files
+* Append multiple flat files into a single parquet file
+* Write SQL to query a parquet file
+
+```
+from bizwiz import flat_file
+
+# Initialize module with a list of file paths that you'll be working with
+ff = flat_file(file_path_list)
+
+# Read in two excel files based on the file path list
+xl1, xl2 = ff.read_multi_excel(concat=True)
+
+# Create multiple parquet files from the ingested excel
+ff.create_multi_parquet(output_directory, [xl1, xl2])
+
+# read in a .sql file and execute it
+sql_file = ff.read_sql_file(file_path)
+conn = pyodbc.connect()
+df = pd.read_sql_query(sql_file, conn)
+```
