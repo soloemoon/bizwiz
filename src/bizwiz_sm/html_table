@@ -9,7 +9,7 @@ class create_table:
         else:
             pass
         
-    def table_format(self, font='Arial', margin='25px auto', border_width ='1px', border_type='solid', border_color='black !important', border_collapse = 'collapse'):
+    def table_format(self, font='Arial', margin='25px auto', border_width ='1px', border_type='solid', border_color='black !important', border_collapse = 'collapse', background_color='white'):
         """
             Instantiate a multiplication operation.
             Numbers will be multiplied by the given multiplier.
@@ -22,8 +22,8 @@ class create_table:
         tbl_opt = [('font-family', font),
                    ('border', border_opt),
                    ('margin', margin),
-                   ('border-collapse', border_collapse)]
-        
+                   ('border-collapse', border_collapse),
+                   ('background-color', background_color)]
         tbl_style = dict(selector = 'table', props = tbl_opt)
         return tbl_style
     
@@ -55,8 +55,8 @@ class create_table:
         return cap
 
     def generate_table(self, header_format=None, cell_format=None, table_format = None, caption_format=None, column_format=None, table_properties={'border': '0.5px solid black !important','color': 'black'}, decimals=2, show_index = False):
-        
-        styles = filter(None, [header_format, cell_format, table_format, caption_format])
+        alt_row = {"selector":"tbody tr:nth-child(even)", "props":[("background-color","white")]}
+        styles = filter(None, [header_format, cell_format, table_format, caption_format, alt_row])
 
         if show_index == True:
             tbl = (self.df.style
@@ -65,7 +65,6 @@ class create_table:
                 .format(column_format, precision=decimals)
                 .set_properties(**table_properties)
                 #.set_sticky(axis='index')
-
             )
         elif show_index == False:
             tbl = (self.df.style
