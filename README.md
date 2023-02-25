@@ -11,8 +11,23 @@ With bizwiz you can:
 # Tables
 Easily create custom tables with optional sparklines using the tables module. Use the default styling (shown below) or customize the table to your hearts content through the helper functions.  
 
+Highlight features:
+* Quickly create highly stylized tables
+* Automatically generate row level sparklines (more customization coming soon)
+* Output your stylized tables to various formats including pdf, powerpoint, and excel (coming soon)
+* Embed stylized tables directly into Quarto (coming soon)
+
+Start by importing the tables module
 ```
 from bizwiz import tables
+```
+
+## Generate a formatted table
+We can pass a dataframe and optionally show sparklines for each row using the create_table initializor. From there we have a series of helper functions to format the table, header, cell, and caption. These are ultimately passed to the `generate_table` function, which also allows us to set the number of decimal places or custom column formatting. Table shown is using default values.
+
+```
+# Custom column formatting
+col_format = {'sepal_length':'{:.2f}', 'sepal_width':'{:.1f}', 'petal_length':'{:.1f}', 'petal_width':'{:.1f}'}
 
 c = create_table(iris, show_sparklines=True)
 table_format = c.table_format()
@@ -25,7 +40,9 @@ c.generate_table(header_format, cell_format, table_format, caption_format, decim
 ```
 <img width="729" alt="Screen Shot 2023-02-25 at 1 01 31 AM" src="https://user-images.githubusercontent.com/57546826/221343719-61887d0d-8b0e-4e78-abf2-8c88a8217e23.png">
 
- Utilize the full suite of pandas styling options in convient helper functions. 
+## Easy Table Formatting
+Utilize the full suite of pandas styling options in convient helper functions. 
+Because this is a pandas styling object, we are able to use the full array of options available. Multiple helper functions are included to make adding column bars, highlighting values, and more incredibly simple.
  
  ```
 col_colors = {'sepal_width':'blue', 'sepal_length':'lightgreen'}
