@@ -1,37 +1,15 @@
-class html_table:
-    styles = [
-        dict(selector="tr:hover",
-                    props=[("background", "#f4f4f4")]),
-
-        dict(selector="th", props=[("color", "#fff"),
-                                ("border", "1px solid #eee"),
-                                ("padding", "12px 35px"),
-                                ("border-collapse", "collapse"),
-                                ("background", "#00cccc"),
-                                ("text-transform", "uppercase"),
-                                ("font-size", "18px")
-                                ]),
-
-        dict(selector="td", props=[("color", "#999"),
-                                ("border", "1px solid #eee"),
-                                ("padding", "12px 35px"),
-                                ("border-collapse", "collapse"),
-                                ("font-size", "15px")
-                                ]),
-        dict(selector="table", props=[
-                                        ("font-family" , 'Arial'),
-                                        ("margin" , "25px auto"),
-                                        ("border-collapse" , "collapse"),
-                                        ("border" , "1px solid #eee"),
-                                        ("border-bottom" , "2px solid #00cccc"),                                    
-                                        ]),
-        dict(selector="caption", props=[("caption-side", "bottom")])
-    ]
-    
-    def __init__(self, df):
+class create_table:
+    def __init__(self, df, show_sparklines=False):
         self.df = df
-    
-    def table_format(self, font='Arial', margin='25px auto', border_width ='1px', border_type='solid', border_color='black', border_collapse = 'collapse'):
+        self.numeric_cols = self.df.select_dtypes(include=np.number).columns.tolist()
+        self.show_sparklines = show_sparklines
+
+        if self.show_sparklines == True:
+            self.row_sparkline()
+        else:
+            pass
+        
+    def table_format(self, font='Arial', margin='25px auto', border_width ='1px', border_type='solid', border_color='black !important', border_collapse = 'collapse'):
         """
             Instantiate a multiplication operation.
             Numbers will be multiplied by the given multiplier.
@@ -49,7 +27,7 @@ class html_table:
         tbl_style = dict(selector = 'table', props = tbl_opt)
         return tbl_style
     
-    def header_format(self, font_size='11px', text_align='center', color='#fff', background='#0912bd', font_style='normal', border_width ='1px', border_type='solid', border_color='black'):
+    def header_format(self, font_size='11px', text_align='center', color='#fff', background='#0912bd', font_style='normal', border_width ='1px', border_type='solid', border_color='black !important'):
         border_opt = border_width + ' ' + border_type + ' ' + border_color
        # Data Cell Element
         th_opt = [('font-size', font_size),
@@ -61,7 +39,7 @@ class html_table:
         th_style = dict(selector = 'th', props = th_opt)
         return th_style
 
-    def cell_format(self, font_size='11px', text_align='center', color='black',  font_style='normal', border_width ='1px', border_type='solid', border_color='black'):
+    def cell_format(self, font_size='11px', text_align='center', color='black',  font_style='normal', border_width ='0.5px', border_type='solid', border_color='black !important', background_color = 'white'):
         border_opt = border_width + ' ' + border_type + ' ' + border_color
         td_opt = [('font-size', font_size),
                  ('font-weight', font_style),
@@ -75,18 +53,19 @@ class html_table:
     def caption_format(self, caption_location='bottom'):
         cap = dict(selector="caption", props=[("caption-side", caption_location)])
         return cap
-    
-    def generate_table(self, header_format=None, cell_format=None, table_format = None, caption_format=None, column_format=None, table_properties={'border': '1.3px solid black','color': 'black'}, decimals=2, show_index = False):
-        styles = filter(None, [header_format, cell_format, table_format, caption_format])
+
+    def generate_table(self, header_format=None, cell_format=None, table_format = None, caption_format=None, column_format=None, table_properties={'border': '0.5px solid black !important','color': 'black'}, decimals=2, show_index = False):
         
+        styles = filter(None, [header_format, cell_format, table_format, caption_format])
 
         if show_index == True:
             tbl = (self.df.style
                 .set_table_styles(styles)
                 #.set_caption(caption)
-                .format(column_format)
+                .format(column_format, precision=decimals)
                 .set_properties(**table_properties)
-                .set_precision(decimals)
+                #.set_sticky(axis='index')
+
             )
         elif show_index == False:
             tbl = (self.df.style
@@ -95,30 +74,33 @@ class html_table:
                 .format(column_format, precision=decimals)
                 .set_properties(**table_properties)
                 .hide(axis='index')
+                #.set_sticky(axis='index')
             )
+            self.table_output = tbl
         return tbl
-        
-     def column_bar(self, column_colors):
+
+    def column_bar(self, column_colors, align='mid',width=100, height=100, vmin=None, vmax=None):
         for k, v in column_colors.items():
-            t = tbl.bar(subset=[k], color=v)
+            t = self.table_output.bar(subset=[k], color=v, align=align, width=width, height=height, vmin=vmin, vmax=vmax)
         return t
-     
-     def highlight_min(self, columns=None, color='red', axis=1):
-        if column is None:
+    
+    def highlight_min(self, columns=None, color='red', axis=1):
+        if columns is None:
             t = self.table_output.highlight_min(subset=self.numeric_cols, color=color, axis=axis)
         else:
             t = self.table_output.highlight_min(subset=columns, color=color, axis=axis)
         return t
     
     def highlight_max(self, columns=None, color='lightgreen', axis=1):
-        if column is None:
+        if columns is None:
             t = self.table_output.highlight_max(subset=self.numeric_cols, color=color, axis=axis)
         else:
             t = self.table_output.highlight_max(subset=columns, color=color, axis=axis)
         return t
     
-    def heatmap(self, columns = None, type = 'background', palette = 'default', color='green'):
+    def heatmap(self, columns = None, type = 'background', palette = 'default', color='green', axis=0, low=0, high=0,vmin=None, vmax=None):
             # type can be background or text
+
         cm_opt = {
             'default': sns.light_palette(color, as_cmap=True),
             'light': sns.light_palette(color, as_cmap=True),
@@ -130,21 +112,59 @@ class html_table:
             'rocket': sns.color_palette('rocket', as_cmap=True),
             'mako': sns.color_palette('mako', as_cmap=True),
             'flare': sns.color_palette('flare', as_cmap=True),
-            'crest': sns.color_palette('crest', as_cmap=True)
+            'crest': sns.color_palette('crest', as_cmap=True),
+            'bluegreen': 'BuGn',
+            'pastel':'Pastel1'
         }
 
         cm = cm_opt[palette]
 
         if columns is None:
             if type == 'background':
-                t = self.table_output.background_gradient(subset=self.numeric_cols, cmap=cm)
+                t = self.table_output.background_gradient(subset=self.numeric_cols, cmap=cm, axis=axis, low=low, high=high, vmin=vmin, vmax=vmax)
 
-            elif type == 'text':
-                t = self.table_output.text_gradient(subset=self.numeric_cols, cmap=cm)
+            elif type == 'text': # Not Working
+                t = self.table_output.text_gradient(subset=self.numeric_cols, cmap=cm, axis=axis,low=low, high=high, vmin=vmin, vmax=vmax)
         else:
             if type == 'background':
-                t = self.table_output.background_gradient(subset=columns, cmap=cm)
+                t = self.table_output.background_gradient(subset=columns, cmap=cm, axis=axis, low=low, high=high, vmin=vmin, vmax=vmax)
 
-            elif type == 'text':
-                t = self.table_output.text_gradient(subset=columns, cmap=cm)
+            elif type == 'text': # Not Working
+                t = self.table_output.text_gradient(subset=columns, cmap=cm, axis=axis, low=low, high=high, vmin=vmin, vmax=vmax)
         return t
+
+    def row_sparkline(self):
+
+        def sparkline(df=self.df, figsize=(4, 0.25), **kwargs):
+            # Turn off the max column width so the images won't be truncated
+            pd.set_option('display.max_colwidth', None)
+        
+            # Turning off the max column will display all the data
+            # if gathering into sets / array we might want to restrict to a few items
+            pd.set_option('display.max_seq_items', 3)
+        
+            #Monkey patch the dataframe so the sparklines are displayed
+            pd.DataFrame._repr_html_ = lambda self: self.to_html(escape=False)
+        
+            data = list(df.values)
+
+            *_, ax = plt.subplots(1, 1, figsize=figsize, **kwargs)
+            ax.plot(data, clip_on=False)
+
+            ax.fill_between(range(len(data)), data, len(data)*[min(data)], alpha=0.1)
+            ax.set_axis_off()
+
+            # Fill entire column
+            plt.subplots_adjust(left=0)
+            plt.subplots_adjust(right=0.99)
+            plt.subplots_adjust(bottom=0.1)
+            plt.subplots_adjust(top=0.9)
+
+            # Generate images for display
+            bio = BytesIO()
+            plt.savefig(bio)
+            plt.close()
+            return """<img src="data:image/png;base64,%s"/>""" % base64.b64encode(bio.getvalue()).decode('utf-8')
+
+        self.df['sparkline'] = self.df[self.numeric_cols].apply(sparkline, axis=1)
+        return self.df
