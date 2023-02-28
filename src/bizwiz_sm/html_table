@@ -1,3 +1,11 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import base64
+from io import BytesIO
+import dataframe_image as dfi
+
 class create_table:
     def __init__(self, df, show_sparklines=False):
         self.df = df
@@ -9,7 +17,7 @@ class create_table:
         else:
             pass
         
-    def table_format(self, font='Arial', margin='25px auto', border_width ='1px', border_type='solid', border_color='black !important', border_collapse = 'collapse', background_color='white'):
+    def table_format(self, font='Arial', margin='25px auto', border_width ='0.5px', border_type='solid', border_color='black !important', border_collapse = 'collapse', background_color='white'):
         """
             Instantiate a multiplication operation.
             Numbers will be multiplied by the given multiplier.
@@ -27,7 +35,7 @@ class create_table:
         tbl_style = dict(selector = 'table', props = tbl_opt)
         return tbl_style
     
-    def header_format(self, font_size='11px', text_align='center', color='#fff', background='#0912bd', font_style='normal', border_width ='1px', border_type='solid', border_color='black !important'):
+    def header_format(self, font_size='11px', text_align='center', color='#fff', background='#0912bd', font_style='normal', border_width ='0.5px', border_type='solid', border_color='black !important'):
         border_opt = border_width + ' ' + border_type + ' ' + border_color
        # Data Cell Element
         th_opt = [('font-size', font_size),
@@ -39,13 +47,12 @@ class create_table:
         th_style = dict(selector = 'th', props = th_opt)
         return th_style
 
-    def cell_format(self, font_size='11px', text_align='center', color='black',  font_style='normal', border_width ='0.5px', border_type='solid', border_color='black !important', background_color = 'white'):
+    def cell_format(self, font_size='11px', text_align='center', color='black',  font_style='normal', border_width ='1px', border_type='solid', border_color='black !important', background_color = 'white'):
         border_opt = border_width + ' ' + border_type + ' ' + border_color
         td_opt = [('font-size', font_size),
                  ('font-weight', font_style),
                  ('text-align', text_align),
                  ('color', color),
-                 #('background-color', background_color),
                  ('border', border_opt)]
         td_style = dict(selector='td', props = td_opt)
         return td_style
@@ -60,19 +67,21 @@ class create_table:
 
         if show_index == True:
             tbl = (self.df.style
-                .set_table_styles(styles)
+                
                 #.set_caption(caption)
                 .format(column_format, precision=decimals)
                 .set_properties(**table_properties)
+                .set_table_styles(styles)
                 #.set_sticky(axis='index')
             )
         elif show_index == False:
             tbl = (self.df.style
-                .set_table_styles(styles)
+                
                 #.set_caption(caption)
                 .format(column_format, precision=decimals)
                 .set_properties(**table_properties)
                 .hide(axis='index')
+                .set_table_styles(styles)
                 #.set_sticky(axis='index')
             )
             self.table_output = tbl
@@ -167,3 +176,6 @@ class create_table:
 
         self.df['sparkline'] = self.df[self.numeric_cols].apply(sparkline, axis=1)
         return self.df
+
+    def tbl_img(self, table_name):
+        dfi.export(self.table_output, f'{table_name}.png')
