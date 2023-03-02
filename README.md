@@ -7,6 +7,7 @@ With bizwiz you can:
 * Quickly generate beautiful formatted tables
 * Efficiently work with flat files, including excel, csv, and parquet
 * Send formatted HTML emails with numerous attachments and embedded images
+* Generate advanced Seaborn/Matplotlib Plots
 
 # Tables
 Easily create custom tables with optional sparklines using the tables module. Use the default styling (shown below) or customize the table to your hearts content through the helper functions.  
@@ -106,6 +107,34 @@ No need to define the table name in the query. Just pass the file path and bizwi
 ```
 sql = 'select * from where year > 2005'
 parquet_path = 'file path here'
+```
+
+# Charts
+
+# Funnel Chart
+```
+t=pd.DataFrame(data={'value1':[80,73,58,42,23,15], 'category':['A', 'B', 'C', 'D', 'E', 'F']})
+
+bizcharts(t).funnel_chart(x_col='value1', label_col='category')
+```
+<img width="751" alt="Screen Shot 2023-03-01 at 7 09 18 PM" src="https://user-images.githubusercontent.com/57546826/222304817-0a2cdc1a-8f1a-4ec3-aa67-202c9e3174c6.png">
+
+# Bullet Graph
+```
+data_to_plot2 = [("User 1", 105, 120),
+                 ("User 2", 99, 110),
+                 ("User 3", 109, 125),
+                 ("User 4", 135, 123),
+                 ("User 5", 45, 105)]
+
+bizcharts(data_to_plot2).bullet_graph(limits=[20, 60, 100, 160],labels=["Poor", "OK", "Good", "Excellent"], size=(8,5),
+            axis_label="Performance Measure",
+            title="Sales Rep Performance")
+
+```
+![image](https://user-images.githubusercontent.com/57546826/222304962-6813f703-3a0b-41ad-a36e-ae8f80bc7dd3.png)
+
+
 
 ff = flat_file()
 results = ff.query_parquet(sql, parquet_path)
