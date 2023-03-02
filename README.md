@@ -120,19 +120,18 @@ bizcharts(t).funnel_chart(x_col='value1', label_col='category')
 <img width="751" alt="Screen Shot 2023-03-01 at 7 09 18 PM" src="https://user-images.githubusercontent.com/57546826/222304817-0a2cdc1a-8f1a-4ec3-aa67-202c9e3174c6.png">
 
 # Bullet Graph
+Based on code provided by Chris Moffit of pbpython.com. 
 ```
 data_to_plot2 = [("User 1", 105, 120),
                  ("User 2", 99, 110),
                  ("User 3", 109, 125),
                  ("User 4", 135, 123),
                  ("User 5", 45, 105)]
-
-bizcharts(data_to_plot2).bullet_graph(limits=[20, 60, 100, 160],labels=["Poor", "OK", "Good", "Excellent"], size=(8,5),
-            axis_label="Performance Measure",
-            title="Sales Rep Performance")
+                 
+bizcharts(data_to_plot2).bullet_graph(limits=[20, 60, 100, 160],labels=["Poor", "OK", "Good", "Excellent"], size=(8,5), axis_label="Metric", title="Performance")
 
 ```
-![image](https://user-images.githubusercontent.com/57546826/222304962-6813f703-3a0b-41ad-a36e-ae8f80bc7dd3.png)
+![image](https://user-images.githubusercontent.com/57546826/222305119-d21ec214-73ad-43e8-ad2f-0a868154d47f.png)
 
 
 
