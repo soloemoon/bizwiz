@@ -5,9 +5,10 @@ bizwiz was created to make office life a bit easier. This package contains a hel
 
 With bizwiz you can:
 * Quickly generate beautiful formatted tables
+* Generate advanced Seaborn/Matplotlib Plots
 * Efficiently work with flat files, including excel, csv, and parquet
 * Send formatted HTML emails with numerous attachments and embedded images
-* Generate advanced Seaborn/Matplotlib Plots
+
 
 # Tables
 Easily create custom tables with optional sparklines using the tables module. Use the default styling (shown below) or customize the table to your hearts content through the helper functions.  
@@ -50,6 +51,44 @@ col_colors = {'sepal_width':'blue', 'sepal_length':'lightgreen'}
 c.column_bar(col_colors, align='left')
  ```
  <img width="729" alt="Screen Shot 2023-02-25 at 1 01 56 AM" src="https://user-images.githubusercontent.com/57546826/221343808-10a429d8-39cc-4028-8e28-6b1449a0ff6d.png">
+ 
+
+# Charts
+Quickly create a number of advanced Seaborn/Matplotlib charts with the use of these helper functions. 
+
+Create:
+* heatmaps
+* dot plots
+* funnel charts
+* horizontal bar graphs
+* multi-chart timeseries
+
+Start by importing the tables module
+```
+from bizwiz import bizcharts
+```
+
+# Funnel Chart
+```
+t=pd.DataFrame(data={'value1':[80,73,58,42,23,15], 'category':['A', 'B', 'C', 'D', 'E', 'F']})
+
+bizcharts(t).funnel_chart(x_col='value1', label_col='category')
+```
+<img width="751" alt="Screen Shot 2023-03-01 at 7 09 18 PM" src="https://user-images.githubusercontent.com/57546826/222304817-0a2cdc1a-8f1a-4ec3-aa67-202c9e3174c6.png">
+
+# Bullet Graph
+Based on code provided by Chris Moffit of pbpython.com. 
+```
+data_to_plot2 = [("User 1", 105, 120),
+                 ("User 2", 99, 110),
+                 ("User 3", 109, 125),
+                 ("User 4", 135, 123),
+                 ("User 5", 45, 105)]
+                 
+bizcharts(data_to_plot2).bullet_graph(limits=[20, 60, 100, 160],labels=["Poor", "OK", "Good", "Excellent"], size=(8,5), axis_label="Metric", title="Performance")
+
+```
+![image](https://user-images.githubusercontent.com/57546826/222305119-d21ec214-73ad-43e8-ad2f-0a868154d47f.png)
 
 # Flat Files
 This module is primarily built on top of polars and xlWings ensuring speed, even when working with the largest of files. 
@@ -105,49 +144,9 @@ df = pd.read_sql_query(sql_file, conn)
 ## Query an existing parquet file
 No need to define the table name in the query. Just pass the file path and bizwiz takes care of the rest.
 ```
-sql = 'select * from where year > 2005'
-parquet_path = 'file path here'
-```
-
-# Charts
-Quickly create a number of advanced Seaborn/Matplotlib charts with the use of these helper functions. 
-
-Create:
-* heatmaps
-* dot plots
-* funnel charts
-* horizontal bar graphs
-* multi-chart timeseries
-
-Start by importing the tables module
-```
-from bizwiz import bizcharts
-```
-
-# Funnel Chart
-```
-t=pd.DataFrame(data={'value1':[80,73,58,42,23,15], 'category':['A', 'B', 'C', 'D', 'E', 'F']})
-
-bizcharts(t).funnel_chart(x_col='value1', label_col='category')
-```
-<img width="751" alt="Screen Shot 2023-03-01 at 7 09 18 PM" src="https://user-images.githubusercontent.com/57546826/222304817-0a2cdc1a-8f1a-4ec3-aa67-202c9e3174c6.png">
-
-# Bullet Graph
-Based on code provided by Chris Moffit of pbpython.com. 
-```
-data_to_plot2 = [("User 1", 105, 120),
-                 ("User 2", 99, 110),
-                 ("User 3", 109, 125),
-                 ("User 4", 135, 123),
-                 ("User 5", 45, 105)]
-                 
-bizcharts(data_to_plot2).bullet_graph(limits=[20, 60, 100, 160],labels=["Poor", "OK", "Good", "Excellent"], size=(8,5), axis_label="Metric", title="Performance")
-
-```
-![image](https://user-images.githubusercontent.com/57546826/222305119-d21ec214-73ad-43e8-ad2f-0a868154d47f.png)
-
-
-
 ff = flat_file()
 results = ff.query_parquet(sql, parquet_path)
+```
+sql = 'select * from where year > 2005'
+parquet_path = 'file path here'
 ```
