@@ -110,6 +110,19 @@ parquet_path = 'file path here'
 ```
 
 # Charts
+Quickly create a number of advanced Seaborn/Matplotlib charts with the use of these helper functions. 
+
+Create:
+* heatmaps
+* dot plots
+* funnel charts
+* horizontal bar graphs
+* multi-chart timeseries
+
+Start by importing the tables module
+```
+from bizwiz import bizcharts
+```
 
 # Funnel Chart
 ```
