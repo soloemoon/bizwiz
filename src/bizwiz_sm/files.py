@@ -6,7 +6,7 @@ import pandas as pd
 import printable
 import duckdb
 
-class flat_file: 
+class files: 
     def __init__(self):
         pass
 
