@@ -1,17 +1,67 @@
-class bizcharts:
-    def __init__(self, data):
-        self.data = data
+import pandas_flavor as pf
+import pandas as pd
+import numpy as np
+import matplotlib as plt
+import seaborn as sns
 
-    def bullet_graph(self, category_col, category_value_col, target_value_col, limits=None, labels=['Poor', 'Ok', 'Good', 'Excellent'], axis_label='Metric', title='Bullet Graph',
-                size=(5, 3), palette_color='green', formatter=None, target_color="gray",
-                bar_color="black", label_color="black"
-                ):
 
-        d = self.data[[category_col, category_value_col, target_value_col]].copy()
+@pf.register_dataframe_method
+def bullet_graph(
+    df: pd.DataFrame, 
+    category_column: str, 
+    category_value_column: str, 
+    target_value_column: str, 
+    limits: list=[20, 40, 80, 100], 
+    labels: list=['Poor', 'Ok', 'Good', 'Excellent'], 
+    axis_label: str='Metric', 
+    title: str='Bullet Graph',
+    size: tuple=(5, 3), 
+    palette_color: str='green', 
+    formatter: str=None, 
+    target_color: str="gray",
+    bar_color: str="black", 
+    label_color: str="black"
+    ):
+        """Create bullet chart based on dataframe values.
 
-        # Convert dataframe to a list of tuples for code to run.
-        dt = list(d.itertuples(index=False, name=None))
-        del d
+            Examples:
+                Functional usage
+
+                >>> import pandas as pd
+                >>> from bizwiz import charter
+                >>> df.bullet_graph(
+                ... category_column = 'category', 
+                ... category_value_column='category_val', 
+                ... target_value_column='target_val', 
+                ... limits=[20, 40, 80, 100]
+                ... )  # doctest: +SKIP
+
+
+            Args:
+                df: dataframe containing chart data
+                category_column: Column name of the category value
+                category_value_column: Column name of the values associated with the category
+                target_value_column: Column name of the values that are targeted for the category column
+                limits: List of x axis values. e.g. [100, 120, 140, 150]
+                labels: List of values associated with what the limits mean. e.g. [Poor, ok, good, excellent]
+                axis_label: X axis label name. Default is Metric.
+                title: Chart title
+                size: Size of chart
+                palette_color: Diverging color to apply to the chart. Default is green. Lighter to Darker.
+                formatter: formats tick as string
+                target_color: Color of the target variable
+                bar_color: Color of the bars
+                label_color: Color of the labelss
+                
+                
+
+            Returns:
+                Matplot Chart object
+        """
+
+         # Convert dataframe to a list of tuples for code to run.
+        dt = list(df[[category_column, category_value_column, target_value_column]].itertuples(index=False, name=None))
+
         # Determine the max value for adjusting the bar height
         h = limits[-1] / 10
 
@@ -77,145 +127,162 @@ class bizcharts:
         g = fig.subplots_adjust(hspace=0)
 
         return g
+
+@pf.register_dataframe_method
+def funnel_graph(
+    df,
+    x_axis_column: str, 
+    label_column: str,
+    title: str ='Funnel Chart',
+    xmin: int=0,
+    xmax: int=100,  
+    bar_color: str ='#808B96', 
+    text_color: str ='#2A2A2A', 
+    fill_color: str='grey'
+    ):
     
-    def funnel_chart(self, x_col, label_col, title='', xmax=100, xmin=0, bar_color='#808B96', text_color='#2A2A2A', fill_color='grey'):
-        """
-        Creates a funnel chart.
+    """Create bullet chart based on dataframe values.
 
-        Parameters
-        ----------
-        limits : list
-            List of range values to increment x axis by
-        labels : list, optional
-            List of shading description descriptions. Default is ['Poor', 'Ok', 'Good', 'Excellent']
-        axis_label : str, optional
-            The x axis label name. Default is metric
-        title: str, optional
-            Title of bullet graph. Default is 'Bullet Graph'
-        size: tuple, optional
-            Tuple for plot size. Default is (5,3)
-        palette_color:s str, optional
-            Seaborn color palette to be used. Default is green.
-        formatter: object, optional
-            Matplotlib formatter object for x axis
-        target_color: str, optional
-            Color of the target line. Default is grey
-        bar_color: str, optional
-            Color of the value bars. Default is black
-        label_color: str, optional
-            Color of the chart labels. Default is black.
-        """
+            Examples:
+                Functional usage
 
-        x_list = self.data[x_col].values.tolist()
-        y = [*range(1, len(x_list)+1)]
-        y.reverse()
+                >>> import pandas as pd
+                >>> from bizwiz import charter
+                >>> df.funnel_graph(
+                ... x_axis_column = 'value1', 
+                ... label_column='category', 
+                ... title = 'Chart Title Here'
+                ... )  # doctest: +SKIP
 
-        labels = self.data[label_col].values.tolist()
-        x_range = xmax - xmin
 
-        fig, ax = plt.subplots(1, figsize=(12,6))
-        for idx, val in enumerate(x_list):
-            left = (x_range - val)/2
-            plt.barh(y[idx], x_list[idx], left = left, color=bar_color, height=.8)
-            # label
-            plt.text(50, y[idx]+0.1, labels[idx], ha='center', fontsize=16, color=text_color)
-            # value
-            plt.text(50, y[idx]-0.3, x_list[idx], ha='center', fontsize=16, color=text_color)
-            
-            if idx != len(x_list)-1:
-                next_left = (x_range - x_list[idx+1])/2
-                shadow_x = [left, next_left, 
-                            100-next_left, 100-left, left]
+            Args:
+                df: dataframe containing chart data
+                x_axis_column: Column name of the x axis
+                label_column: Column name of the labels
+                title: Chart title
+                xmin: x axis minimum. Default is 0.
+                xmax: x axis maximum. Default is 100.
+                bar_color: Bar color
+                text_color: Text color
+                fill_color: Fill color
                 
-                shadow_y = [y[idx]-0.4, y[idx+1]+0.4, 
-                            y[idx+1]+0.4, y[idx]-0.4, y[idx]-0.4]
-                plt.fill(shadow_x, shadow_y, color=fill_color, alpha=0.6)
+            Returns:
+                Matplot Chart object
+    """
+
+    x_list = df[x_axis_column].values.tolist()
+    y = [*range(1, len(x_list)+1)]
+    y.reverse()
+
+    labels = df[label_column].values.tolist()
+    x_range = xmax - xmin
+
+    fig, ax = plt.subplots(1, figsize=(12,6))
+    for idx, val in enumerate(x_list):
+        left = (x_range - val)/2
+        plt.barh(y[idx], x_list[idx], left = left, color=bar_color, height=.8)
+        # label
+        plt.text(50, y[idx]+0.1, labels[idx], ha='center', fontsize=16, color=text_color)
+        # value
+        plt.text(50, y[idx]-0.3, x_list[idx], ha='center', fontsize=16, color=text_color)
+            
+        if idx != len(x_list)-1:
+            next_left = (x_range - x_list[idx+1])/2
+            shadow_x = [left, next_left, 100-next_left, 100-left, left]
+                
+            shadow_y = [y[idx]-0.4, y[idx+1]+0.4, y[idx+1]+0.4, y[idx]-0.4, y[idx]-0.4]
+            plt.fill(shadow_x, shadow_y, color=fill_color, alpha=0.6)
         plt.xlim(xmin, xmax)
         plt.axis('off')
         plt.title(title, loc='center', fontsize=24, color=text_color)
         plt.show()
 
-    def dot_plot(self, sort_column, x_columns, y_column, xlabel, ylabel, column_titles, xlim=(0,25)):
-       
-        # Data should be in individual columns with values in rows (wide)
-        sns.set_theme(style="whitegrid")
-        g = sns.PairGrid(self.data.sort_values(sort_column, ascending=False),
-                 x_vars=self.data[x_columns], y_vars=[y_column],
-                 height=10, aspect=.25)
+@pf.register_dataframe_method
+def dot_plot(df, sort_column, x_axis_column, y_axis_column, x_label, y_label, column_titles, xlim=(0, 25)):
+    sns.set_theme(style='whitegrid')
+
+    g = sns.PairGrid(
+        df.sort_values(sort_column, ascending=False), 
+        x_vars = df[x_axis_column],
+        y_vars=df[y_axis_column],
+        height=10,
+        aspect=.25
+    )
+
+    g.map(sns.stripplot, size=10, orient='h', jitter=False, palette='flare_r', linewidth=1, edgecolor='w')
+    g.set(xlim=xlim, xlabel=x_label, ylabel=y_label)
+
+    for ax, title in zip(g.axes.flat, column_titles):
+        # Sets title for each axes
+        ax.set(title=title)
+        # horizontal grid
+        ax.xaxis.grid(False)
+        ax.yaxis.grid(True)
+    
+    sns.despine(left=True, bottom=True)
+
+    return g
+
+@pf.register_dataframe_method
+def heatmap(
+    df: pd.DataFrame,
+      index_column: str, 
+      columns: str,  
+      values_columns: str 
+    ):
+
+    df = df.pivot(index=index_column, columns=columns, values=values_columns)
+    #Draw heatmap with numeric values in each cell
+    f, ax = plt.subplots(figsize=(9,6))
+    hm = sns.heatmap(df, annot=True, fmt='d', linewidth=.5, ax=ax)
+
+    return hm
+
+@pf.register_dataframe_method
+def multi_timeseries(
+    df: pd.DataFrame, 
+    x_axis_column: str, 
+    y_axis_column: str, 
+    hue: str, 
+    facet_column: str = None, 
+    x_label: str = '', 
+    y_label: str = ''
+):
+
+    g = sns.relplot(
+        data = df,
+        x = x_axis_column,
+        y = y_axis_column,
+        col = facet_column,
+        hue = hue,
+        kind = 'line', 
+        palette = 'crest',
+        linewidth = 4,
+        zorder = 5,
+        col_wrap = 3,
+        height = 2,
+        aspect = 1.5,
+        legend = False
+    )
+
+    for hue, ax in g.axes_dict.items():
+            
+        ax.text(.8, .85, hue, transform = ax.transAxes, fontweight='bold')
+
+        sns.lineplot(
+            data=df, 
+            x=x_axis_column, 
+            y=y_axis_column, 
+            units=hue, 
+            estimator=None, 
+            color=".7", 
+            linewidth=1, 
+            ax=ax,
+        )
         
-        # Draw a dot plot using the stripplot function
-        g.map(sns.stripplot, size=10, orient="h", jitter=False, palette="flare_r", linewidth=1, edgecolor="w")
-
-        # Use the same x axis limits on all columns and add better labels
-        g.set(xlim=xlim, xlabel=xlabel, ylabel=ylabel)
-
-        for ax, title in zip(g.axes.flat, column_titles):
-
-            # Set a different title for each axes
-            ax.set(title=title)
-
-            # Make the grid horizontal instead of vertical
-            ax.xaxis.grid(False)
-            ax.yaxis.grid(True)
-
-        sns.despine(left=True, bottom=True)
-
-        return g
+    ax.set_xticks(ax.get_xticks()[::2])
+    g.set_titles("")
+    g.set_axis_labels(x_label, y_label)
+    g.tight_layout()
     
-    def barh(self, sort_column, total_x, second_x, y, total_label, second_label, bar_color, legend_location='lower right', xlim=(0, 24), ylabel='', xlabel=''):
-
-
-        sns.set_theme(style="whitegrid")
-
-        df = self.data.sort_values(sort_column, ascending=False)
-        # Initialize the matplotlib figure
-        f, ax = plt.subplots(figsize=(6, 15))
-
-        # Plot the total
-        sns.set_color_codes("pastel")
-        sns.barplot(x=total_x, y=y, data=df,
-                    label=total_label, color=bar_color)
-
-        # Plot the crashes where alcohol was involved
-        sns.set_color_codes("muted")
-        sns.barplot(x=second_x, y=y, data=df,
-                    label=second_label, color=bar_color)
-
-        # Add a legend and informative axis label
-        ax.legend(ncol=2, loc=legend_location, frameon=True)
-        ax.set(xlim=xlim, ylabel=ylabel,
-            xlabel=xlabel)
-        sns.despine(left=True, bottom=True)
-    
-    def heatmap(self, index, columns, values):
-        df = self.data.pivot(index=index, columns=columns, values=values)
-        # Draw a heatmap with the numeric values in each cell
-        f, ax = plt.subplots(figsize=(9, 6))
-        sns.heatmap(df, annot=True, fmt="d", linewidths=.5, ax=ax)
-
-    def multi_timeseries(self, x, y, column, hue, xlabel='', ylabel='' ):
-        g = sns.relplot(
-            data = self.data,
-            x = x,
-            y =y,
-            col = column,
-            hue = hue,
-            kind= 'line', palette='crest', linewidth=4, zorder=5,
-                col_wrap=3, height=2, aspect=1.5, legend=False, 
-                    )
-
-        for hue, ax in g.axes_dict.items():
-            ax.text(.8, .85, hue, transform = ax.transAxes, fontweight='bold')
-
-            sns.lineplot(
-                data=self.data, x=x, y=y, units=hue, estimator=None, color=".7", linewidth=1, ax=ax,
-            )
-        
-        ax.set_xticks(ax.get_xticks()[::2])
-        g.set_titles("")
-        g.set_axis_labels(xlabel, ylabel)
-        g.tight_layout()
-        return g
-    
-    
-    
+    return g
